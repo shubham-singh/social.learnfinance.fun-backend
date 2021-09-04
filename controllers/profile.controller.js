@@ -123,8 +123,8 @@ const follow = async (req, res) => {
     const userProfile = await Profile.findOne({ user_id: req.user.userID });
     const followingProfile = await Profile.findOne({ _id: profileID });
     if (userProfile && followingProfile) {
-      userProfile.following.push(profileID);
-      followingProfile.followers.push(userProfile._id);
+      userProfile.following.unshift(profileID);
+      followingProfile.followers.unshift(userProfile._id);
       await userProfile.save();
       await followingProfile.save();
     } else {

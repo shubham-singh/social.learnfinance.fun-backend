@@ -4,6 +4,8 @@ const cors = require('cors');
 const { checkUser } = require('./middleware/auth.middleware.js');
 const profileRoutes = require('./routes/profile.route.js');
 const authRoutes = require('./routes/auth.route.js');
+const postRoutes = require('./routes/post.route.js');
+const feedRoutes = require('./routes/feed.route.js');
 
 const app = express();
 
@@ -20,8 +22,13 @@ app.get('/', (req, res) => {
 
 app.use('/user', authRoutes);
 
+app.use('/post', postRoutes);
+
 app.use(checkUser);
 
+app.use('/feed', feedRoutes);
+
 app.use('/profile', profileRoutes);
+
 
 app.listen(process.env.PORT || 3000, '0.0.0.0');

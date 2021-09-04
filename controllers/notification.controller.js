@@ -42,7 +42,7 @@ const createNotification = async (req, res) => {
       });
       await newRecieverNotifications.save();
     } else {
-      recieverNotifications.notifications.push(notification._id);
+      recieverNotifications.notifications.unshift(notification._id);
       await recieverNotifications.save();
     }
     res.status(200).json({

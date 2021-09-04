@@ -6,5 +6,9 @@ const { getProfile, createProfile, checkUsername, changeUsername, changeProfile,
 router
 .get('/', getProfile)
 .post('/', createProfile)
+.post('/username/check', checkUsername)
+.post('/username/change', changeUsername)
+.post('/follow', follow)
+.post('/unfollow', unfollow);
 
 module.exports = router;

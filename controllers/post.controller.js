@@ -2,7 +2,19 @@ const { UserPost, Post, Profile } = require('../db/db.connect');
 
 const getAllPost = async (req, res) => {
   try {
-    const posts = await UserPost.findOne({ author: req.user.profileID });
+    const profileID = await Profile.findOne({ username: req.username })
+    const posts = await UserPost.findOne({ author: profileID }).populate('posts').populate({
+      path: "posts",
+      populate: { 
+        path: "author",
+        select: "_id username name img.profile"
+      }
+      // path: "posts",
+      // populate: { 
+      //   path: "likes",
+      //   select: "_id username name"
+      // }
+    });
     if (posts === null) {
       return res.status(200).json({
         success: true,
@@ -25,16 +37,16 @@ const getAllPost = async (req, res) => {
 
 const getPost = async (req, res) => {
   try {
-    const { postID } = req;
+    const postID = req.params.postID;
     const post = await Post.findOne({ _id: postID })
-    .populate({ path: 'author', select: 'username name img' })
-    .populate({ path: 'likes', select: 'username name img' })
-    .populate({ 
-      path: 'replies', 
-      populate: {
-        path: 'author likes'
-      }
-    });
+    .populate({ path: 'author', select: 'username name img.profile' })
+    .populate({ path: 'likes', select: '_id username name img.profile' })
+    // .populate({ 
+    //   path: 'replies', 
+    //   populate: {
+    //     path: 'author likes'
+    //   }
+    // });
     if (post === null) {
       throw new Error('post deleted')
     }
@@ -61,8 +73,16 @@ const post = async (req, res) => {
       replies: []
     });
     const post = await newPost.save();
-    user_posts.posts.push(post._id);
-    await user_post.save();
+    if (user_posts === null) {
+      const newUserPost = new UserPost({
+        author: req.user.profileID,
+        posts: [post._id]
+      });
+      await newUserPost.save();
+    } else {
+      user_posts.posts.unshift(post._id);
+      await user_posts.save();
+    }
     res.status(200).json({
       success: true,
       post
@@ -94,15 +114,23 @@ const deletePost = async (req, res) => {
   }
 }
 
-const likePost = async (req, res) => {
+const likeUnlikePost = async (req, res) => {
   try {
+    // const postID = req.params.postID;
     const { postID } = req.body;
     const post = await Post.findOne({ _id: postID });
     const profile = await Profile.findOne({ user_id: req.user.userID });
-    post.likes.push(profile._id);
+    if (post.likes.includes(profile._id)) {
+      post.likes.pull(profile._id)
+    } else {
+      post.likes.unshift(profile._id);
+    }
     await post.save();
+    // await post.populate({ path: 'author', select: 'username name img' })
+    // .populate({ path: 'likes', select: 'username name img' }).exec();
     res.status(200).json({
       success: true,
+      profileID: profile._id,
       post
     })
   } catch (error) {
@@ -113,4 +141,6 @@ const likePost = async (req, res) => {
   }
 }
 
-module.exports = { post, deletePost, likePost, unlikePost }
+const unlikePost = 1;
+
+module.exports = { getAllPost, getPost ,post, deletePost, likeUnlikePost, unlikePost }
