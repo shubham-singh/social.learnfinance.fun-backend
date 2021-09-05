@@ -1,4 +1,5 @@
 const { UserPost, Post, Profile } = require('../db/db.connect');
+const { createNotification } = require('./notification.controller');
 
 const getAllPost = async (req, res) => {
   try {
@@ -73,6 +74,7 @@ const post = async (req, res) => {
       replies: []
     });
     const post = await newPost.save();
+    await post.populate({ path: 'author', select: 'username name img.profile' })
     if (user_posts === null) {
       const newUserPost = new UserPost({
         author: req.user.profileID,
@@ -116,7 +118,6 @@ const deletePost = async (req, res) => {
 
 const likeUnlikePost = async (req, res) => {
   try {
-    // const postID = req.params.postID;
     const { postID } = req.body;
     const post = await Post.findOne({ _id: postID });
     const profile = await Profile.findOne({ user_id: req.user.userID });
@@ -124,10 +125,12 @@ const likeUnlikePost = async (req, res) => {
       post.likes.pull(profile._id)
     } else {
       post.likes.unshift(profile._id);
+      if (!req.user.profileID.equals(post.author)) {
+        createNotification({postID, senderID: req.user.profileID, recieverID: post.author});
+      }
     }
     await post.save();
-    // await post.populate({ path: 'author', select: 'username name img' })
-    // .populate({ path: 'likes', select: 'username name img' }).exec();
+    
     res.status(200).json({
       success: true,
       profileID: profile._id,
@@ -141,6 +144,5 @@ const likeUnlikePost = async (req, res) => {
   }
 }
 
-const unlikePost = 1;
 
-module.exports = { getAllPost, getPost ,post, deletePost, likeUnlikePost, unlikePost }
+module.exports = { getAllPost, getPost ,post, deletePost, likeUnlikePost }

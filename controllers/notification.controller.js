@@ -1,13 +1,12 @@
 const { Notification, UserNotification } = require('../db/db.connect');
 
-const createNotification = async (req, res) => {
+const createNotification = async ({postID, profileID, replyID, senderID ,recieverID}) => {
   try {
-    const { postID, profileID, replyID, revieverID } = req.body;
     let notification;
     if (postID !== undefined) {
       notification = new Notification({
         reciever: recieverID,
-        sender: req.user.profileID,
+        sender: senderID,
         type: 'LIKED',
         on: postID,
         onModel: 'post'
@@ -16,7 +15,7 @@ const createNotification = async (req, res) => {
     if (profileID !== undefined) {
       notification = new Notification({
         reciever: recieverID,
-        sender: req.user.profileID,
+        sender: senderID,
         type: 'FOLLOWED',
         on: profileID,
         onModel: 'profile'
@@ -25,7 +24,7 @@ const createNotification = async (req, res) => {
     if (replyID !== undefined) {
       notification = new Notification({
         reciever: recieverID,
-        sender: req.user.profileID,
+        sender: senderID,
         type: 'LIKED',
         on: replyID,
         onModel: 'reply'
@@ -33,7 +32,7 @@ const createNotification = async (req, res) => {
     }
     await notification.save();
 
-    const recieverNotifications = await UserNotification.findOne({ profileId: recieverID });
+    const recieverNotifications = await UserNotification.findOne({ profileID: recieverID });
 
     if (recieverNotifications === null) {
       const newRecieverNotifications = new UserNotification({
@@ -45,15 +44,37 @@ const createNotification = async (req, res) => {
       recieverNotifications.notifications.unshift(notification._id);
       await recieverNotifications.save();
     }
-    res.status(200).json({
-      success: true,
-    })
   } catch (error) {
-    res.status(400).json({
-      success: false,
-      error: error.message
-    })
   }
 }
 
-module.exports = { createNotification }
+const getNotification = async (req, res) => {
+  try {
+    const notification = await UserNotification.findOne({ profileID: req.user.profileID });
+    // const notification = await UserNotification.findOne({ profileID: req.user.profileID }).populate({
+    //   path: 'notifications',
+    //   select: 'type isRead',
+    //   populate: {
+    //     path: 'on'
+    //   }
+    // });
+    // const notification = await UserNotification.findOne({ profileID: req.user.profileID }).populate('notifications');
+    console.log(notification);
+    if (notification === null) {
+      return res.status(200).json({
+        success: true,
+        notification: []
+      })
+    }
+    
+    res.status(200).json({
+      success: true,
+      notification
+    })
+  } catch (error) {
+    success: false;
+    error: error.message
+  }
+}
+
+module.exports = { getNotification ,createNotification }

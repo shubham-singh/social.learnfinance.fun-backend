@@ -1,4 +1,5 @@
 const { Profile } = require('../db/db.connect');
+const { createNotification } = require('./notification.controller');
 
 const getProfile = async (req, res) => {
   try {

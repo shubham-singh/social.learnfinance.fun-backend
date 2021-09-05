@@ -2,7 +2,7 @@ const { Profile, Post, UserPost } = require('../db/db.connect');
 
 const getFeed = async (req, res) => {
   try {
-    const user = await Profile.findOne(req.user.profileID);
+    const user = await Profile.findOne({_id: req.user.profileID});
     const userPosts = await UserPost.findOne({ author: req.user.profileID }).populate('posts').populate({
       path: "posts",
       populate: { 
