@@ -10,11 +10,6 @@ const getAllPost = async (req, res) => {
         path: "author",
         select: "_id username name img.profile"
       }
-      // path: "posts",
-      // populate: { 
-      //   path: "likes",
-      //   select: "_id username name"
-      // }
     });
     if (posts === null) {
       return res.status(200).json({

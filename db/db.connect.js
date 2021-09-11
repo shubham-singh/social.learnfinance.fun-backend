@@ -11,12 +11,6 @@ const dbConnect = mongoose.createConnection(dbURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
-// const dbConnect = mongoose.createConnection(dbURI, {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true,
-//   useCreateIndex: true,
-//   useFindAndModify: false
-// })
 
 const Profile = dbConnect.model('profile', profileSchema);
 const Post = dbConnect.model('post', postSchema);

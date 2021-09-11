@@ -8,7 +8,7 @@ const createNotification = async ({postID, profileID, replyID, senderID ,recieve
         reciever: recieverID,
         sender: senderID,
         type: 'LIKED',
-        on: postID,
+        onItem: postID,
         onModel: 'post'
       });
     }
@@ -17,7 +17,7 @@ const createNotification = async ({postID, profileID, replyID, senderID ,recieve
         reciever: recieverID,
         sender: senderID,
         type: 'FOLLOWED',
-        on: profileID,
+        onItem: profileID,
         onModel: 'profile'
       });
     }
@@ -26,7 +26,7 @@ const createNotification = async ({postID, profileID, replyID, senderID ,recieve
         reciever: recieverID,
         sender: senderID,
         type: 'LIKED',
-        on: replyID,
+        onItem: replyID,
         onModel: 'reply'
       });
     }
@@ -50,16 +50,14 @@ const createNotification = async ({postID, profileID, replyID, senderID ,recieve
 
 const getNotification = async (req, res) => {
   try {
-    const notification = await UserNotification.findOne({ profileID: req.user.profileID });
-    // const notification = await UserNotification.findOne({ profileID: req.user.profileID }).populate({
-    //   path: 'notifications',
-    //   select: 'type isRead',
-    //   populate: {
-    //     path: 'on'
-    //   }
-    // });
-    // const notification = await UserNotification.findOne({ profileID: req.user.profileID }).populate('notifications');
-    console.log(notification);
+    const notification = await UserNotification.findOne({ profileID: req.user.profileID }).populate("notifications").populate({
+      path: "notifications",
+      populate: {
+        path: "sender",
+        select: "_id username name img.profile"
+      }
+    });
+    
     if (notification === null) {
       return res.status(200).json({
         success: true,

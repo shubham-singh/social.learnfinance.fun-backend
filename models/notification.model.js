@@ -15,7 +15,7 @@ const notificationSchema = new Schema({
     enum: ['LIKED', 'FOLLOWED'],
     required: [true, 'notification is of type empty']
   },
-  on: {
+  onItem: {
     type: Schema.Types.ObjectId,
     refPath: 'onModel'
   },
@@ -35,37 +35,7 @@ const userNotificationSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'profile'
   },
-  notifications: [ { type: Schema.Types.ObjectId, ref: 'notification' } ]
-  // notifications: [
-  //   {
-  //     reciever: {
-  //       type: Schema.Types.ObjectId,
-  //       ref: 'profile'
-  //     },
-  //     sender: {
-  //       type: Schema.Types.ObjectId,
-  //       ref: 'profile'
-  //     },
-  //     type: {
-  //       type: String,
-  //       enum: ['LIKED', 'FOLLOWED'],
-  //       required: [true, 'notification is of type empty']
-  //     },
-  //     on: {
-  //       type: Schema.Types.ObjectId,
-  //       refPath: 'notifications.onModel'
-  //     },
-  //     onModel: {
-  //       type: String,
-  //       required: true,
-  //       enum: ['profile', 'post', 'reply']
-  //     },
-  //     isRead: {
-  //       type: Boolean,
-  //       default: false
-  //     }
-  //   }
-  // ]
+  notifications: [{ type: Schema.Types.ObjectId, ref: 'notification' }]
 })
 
 module.exports = { notificationSchema, userNotificationSchema }
