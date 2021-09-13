@@ -152,7 +152,8 @@ const follow = async (req, res) => {
       throw new Error('failed to follow')
     }
     res.status(200).json({
-      success: true
+      success: true,
+      profileID
     })
   } catch (error) {
     res.status(400).json({
@@ -178,7 +179,8 @@ const unfollow = async (req, res) => {
     }
 
     res.status(200).json({
-      success: true
+      success: true,
+      profileID
     })
 
   } catch (error) {
