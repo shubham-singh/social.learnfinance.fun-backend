@@ -25,11 +25,11 @@ app.use('/user', authRoutes);
 
 app.use('/post', postRoutes);
 
+app.use('/profile', profileRoutes);
+
 app.use(checkUser);
 
 app.use('/feed', feedRoutes);
-
-app.use('/profile', profileRoutes);
 
 app.use('/notification', notificationRoutes);
 

@@ -1,10 +1,30 @@
-const { Profile } = require('../db/db.connect');
+const { Profile, UserPost } = require('../db/db.connect');
 const { createNotification } = require('./notification.controller');
+
+const getProfileByUsername = async (req, res) => {
+  try {
+    const username = req.params.username;
+    const profile = await Profile.findOne({ username });
+    if (profile === null) {
+      return res.status(204).json({
+        success: true
+      })
+    }
+    res.status(200).json({
+      success: true,
+      profile: profile
+    })
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      error: error.message
+    })
+  }
+}
 
 const getProfile = async (req, res) => {
   try {
     const profile = await Profile.findOne({ user_id: req.user.userID });
-    
     if (profile === null) {
       return res.status(200).json({
         success: true,
@@ -169,4 +189,4 @@ const unfollow = async (req, res) => {
   }
 }
 
-module.exports = { getProfile,createProfile, checkUsername, changeUsername, changeProfile, follow, unfollow }
+module.exports = { getProfileByUsername, getProfile,createProfile, checkUsername, changeUsername, changeProfile, follow, unfollow }

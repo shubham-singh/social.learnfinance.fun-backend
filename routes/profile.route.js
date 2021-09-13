@@ -1,9 +1,14 @@
 const express = require('express');
 const router = express.Router();
 
-const { getProfile, createProfile, checkUsername, changeUsername, changeProfile, follow, unfollow } = require('../controllers/profile.controller');
+const { checkUser } = require('../middleware/auth.middleware.js');
+
+const { getProfileByUsername, getProfile, createProfile, checkUsername, changeUsername, changeProfile, follow, unfollow } = require('../controllers/profile.controller');
 
 router
+.get('/:username', getProfileByUsername)
+router
+.use(checkUser)
 .get('/', getProfile)
 .post('/', createProfile)
 .post('/username/check', checkUsername)

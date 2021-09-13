@@ -4,7 +4,6 @@ const { Profile } = require('../db/db.connect.js');
 const secret = process.env['secret'];
 
 const checkUser = async (req, res, next) => {
-  
   const token = req.headers.authorization;
 
   try {
@@ -22,7 +21,6 @@ const checkUser = async (req, res, next) => {
       throw Error('token not found')
     } 
   } catch (error) {
-    console.log(error);
       res.status(401).json({
         success: false,
         error: error.message

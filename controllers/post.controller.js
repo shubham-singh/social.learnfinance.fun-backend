@@ -4,7 +4,7 @@ const { createNotification } = require('./notification.controller');
 const getAllPost = async (req, res) => {
   try {
     const profileID = await Profile.findOne({ username: req.username })
-    const posts = await UserPost.findOne({ author: profileID }).populate('posts').populate({
+    const posts = await UserPost.findOne({ author: profileID._id }).populate('posts').populate({
       path: "posts",
       populate: { 
         path: "author",
