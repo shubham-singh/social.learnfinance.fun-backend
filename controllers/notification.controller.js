@@ -61,7 +61,9 @@ const getNotification = async (req, res) => {
     if (notification === null) {
       return res.status(200).json({
         success: true,
-        notification: []
+        notification: {
+          notifications: []
+        }
       })
     }
     
@@ -75,4 +77,52 @@ const getNotification = async (req, res) => {
   }
 }
 
-module.exports = { getNotification ,createNotification }
+const readNotification = async (req, res) => {
+  try {
+    const { notificationID } = req.body;
+    const filter = { _id: notificationID };
+    const update = { isRead: true };
+    const notification = Notification.findOneAndUpdate(filter, update, {
+      new: true
+    });
+    res.status(200).json({
+      success: true,
+      notification
+    })
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      error: error.message
+    })
+  }
+}
+
+const readAllNotification = async (req, res) => {
+  try {
+    const user_notifications = await UserNotification.findOne({ profileID: req.user.profileID });
+
+    if (user_notifications === null) {
+      return res.status(200).json({
+        success: true
+      })
+    }
+
+    await Promise.all(
+      user_notifications.notifications.map((notificationID) => {
+        return Notification.findOneAndUpdate({_id: notificationID}, { isRead: true })
+      })
+    )
+
+    res.status(200).json({
+      success: true
+    })
+    
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      error: error.message
+    })
+  }
+}
+
+module.exports = { getNotification, createNotification, readNotification, readAllNotification }

@@ -148,6 +148,9 @@ const follow = async (req, res) => {
       followingProfile.followers.unshift(userProfile._id);
       await userProfile.save();
       await followingProfile.save();
+      if (profileID !== userProfile._id) {
+        createNotification({profileID, senderID: req.user.profileID, recieverID: profileID});
+      }
     } else {
       throw new Error('failed to follow')
     }
