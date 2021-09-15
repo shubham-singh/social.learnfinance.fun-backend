@@ -5,11 +5,6 @@ const getProfileByUsername = async (req, res) => {
   try {
     const username = req.params.username;
     const profile = await Profile.findOne({ username });
-    if (profile === null) {
-      return res.status(204).json({
-        success: true
-      })
-    }
     res.status(200).json({
       success: true,
       profile: profile
