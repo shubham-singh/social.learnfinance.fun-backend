@@ -1,5 +1,7 @@
 const { Profile, UserPost } = require('../db/db.connect');
 const { createNotification } = require('./notification.controller');
+const cloudinary = require("../db/cloudinary");
+const upload = require("../middleware/multer");
 
 const getProfileByUsername = async (req, res) => {
   try {
@@ -42,15 +44,32 @@ const getProfile = async (req, res) => {
 
 const createProfile = async (req, res) => {
   try {
-    const { username, name, bio ,imgProfile, imgCover } = req.body;
+    const { username, name, bio } = req.body;
+    var imgProfile = "", imgCover = "", imgProfileID = "", imgCoverID = "";
+    if (req.files["imgProfile"] !== undefined) {
+      const result = await cloudinary.uploader.upload(req.files["imgProfile"][0].path);
+      imgProfile = result.secure_url;
+      imgProfileID = result.public_id;
+    }
+    if (req.files["imgCover"] !== undefined) {
+      const result = await cloudinary.uploader.upload(req.files["imgCover"][0].path);
+      imgCover = result.secure_url;
+      imgCoverID = result.public_id;
+    }
     const newProfile = new Profile({
       user_id: req.user.userID,
       username,
       name,
       bio,
       img: {
-        profile: imgProfile,
-        cover: imgCover
+        profile: {
+          src: imgProfile,
+          cloudinary_id: imgProfileID
+        },
+        cover: {
+          src: imgCover,
+          cloudinary_id: imgCoverID
+        }
       },
       following: [],
       followers: []
@@ -61,6 +80,8 @@ const createProfile = async (req, res) => {
       profile
     })
   } catch (error) {
+    await cloudinary.uploader.destroy(imgProfileID);
+    await cloudinary.uploader.destroy(imgCoverID);
     res.status(400).json({
       success: false,
       error: error.message
@@ -110,14 +131,31 @@ const changeUsername = async (req, res) => {
 
 const changeProfile = async (req, res) => {
   try {
-    const { name, bio ,imgProfile, imgCover } = req.body;
+    const { name, bio } = req.body;
+    var imgProfile = "", imgCover = "", imgProfileID = "", imgCoverID = "";
+    if (req.files["imgProfile"] !== undefined) {
+      const result = await cloudinary.uploader.upload(req.files["imgProfile"][0].path);
+      imgProfile = result.secure_url;
+      imgProfileID = result.public_id;
+    }
+    if (req.files["imgCover"] !== undefined) {
+      const result = await cloudinary.uploader.upload(req.files["imgCover"][0].path);
+      imgCover = result.secure_url;
+      imgCoverID = result.public_id;
+    }
     const filter = { user_id: userID }
     const update = {
       name,
       bio,
       img: {
-        profile: imgProfile,
-        cover: imgCover
+        profile: {
+          src: imgProfile,
+          cloudinary_id: imgProfileID
+        },
+        cover: {
+          src: imgCover,
+          cloudinary_id: imgCoverID
+        }
       }
     }
     const profile = await Profile.findOne(filter, update, { new: true })
@@ -126,6 +164,8 @@ const changeProfile = async (req, res) => {
       profile
     })
   } catch (error) {
+    await cloudinary.uploader.destroy(imgProfileID);
+    await cloudinary.uploader.destroy(imgCoverID);
     res.status(400).json({
       success: false,
       error: error.message
