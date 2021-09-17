@@ -25,10 +25,20 @@ const profileSchema = new Schema({
   },
   img: {
     profile: {
-      type: String
+      src: {
+        type: String
+      },
+      cloudinary_id: {
+        type: String
+      }
     },
     cover: {
-      type: String
+      src: {
+        type: String
+      },
+      cloudinary_id: {
+        type: String
+      }
     }
   },
   following: [{type: Schema.Types.ObjectId, ref: 'profile'}],
