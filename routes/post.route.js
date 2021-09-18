@@ -20,5 +20,6 @@ router
 .use(checkUser)
 .post('/', post)
 .post('/:postID/react', likeUnlikePost)
+.delete('/:postID', deletePost)
 
 module.exports = router;

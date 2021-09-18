@@ -94,7 +94,7 @@ const post = async (req, res) => {
 
 const deletePost = async (req, res) => {
   try {
-    const { postID } = req.body;
+    const postID = req.params.postID;
     const deletedPost = await Post.deleteOne({ _id: postID })
     const user_posts = await UserPost.findOne({ author: req.user.profileID });
     user_posts.posts.pull(postID);
@@ -104,6 +104,7 @@ const deletePost = async (req, res) => {
       deletedPost
     })
   } catch (error) {
+    console.log(error);
     res.status(200).json({
       success: false,
       error: error.message
