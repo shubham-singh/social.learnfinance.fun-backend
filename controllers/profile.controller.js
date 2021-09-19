@@ -191,7 +191,8 @@ const follow = async (req, res) => {
     }
     res.status(200).json({
       success: true,
-      profileID
+      profileID,
+      followedBy: req.user.profileID
     })
   } catch (error) {
     res.status(400).json({
@@ -218,7 +219,8 @@ const unfollow = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      profileID
+      profileID,
+      unfollowedBy: req.user.profileID
     })
 
   } catch (error) {

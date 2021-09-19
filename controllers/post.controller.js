@@ -1,5 +1,6 @@
 const { UserPost, Post, Profile } = require('../db/db.connect');
 const { createNotification } = require('./notification.controller');
+const cloudinary = require("../db/cloudinary");
 
 const getAllPost = async (req, res) => {
   try {
@@ -61,10 +62,20 @@ const getPost = async (req, res) => {
 const post = async (req, res) => {
   try {
     const { body } = req.body;
+    var image = "", imageID = "";
+    if (req.file !== undefined) {
+      const result = await cloudinary.uploader.upload(req.file.path);
+      image = result.secure_url;
+      imageID = result.public_id;
+    }
     const user_posts = await UserPost.findOne({ author: req.user.profileID });
     const newPost = new Post({
       author: req.user.profileID,
       body: body,
+      img: {
+        src: image,
+        cloudinary_id: imageID
+      },
       likes: [],
       replies: []
     });
@@ -91,19 +102,55 @@ const post = async (req, res) => {
     })
   }
 }
+// const post = async (req, res) => {
+//   try {
+//     const { body } = req.body;
+//     const user_posts = await UserPost.findOne({ author: req.user.profileID });
+//     const newPost = new Post({
+//       author: req.user.profileID,
+//       body: body,
+//       likes: [],
+//       replies: []
+//     });
+//     const post = await newPost.save();
+//     await post.populate({ path: 'author', select: 'username name img.profile' })
+//     if (user_posts === null) {
+//       const newUserPost = new UserPost({
+//         author: req.user.profileID,
+//         posts: [post._id]
+//       });
+//       await newUserPost.save();
+//     } else {
+//       user_posts.posts.unshift(post._id);
+//       await user_posts.save();
+//     }
+//     res.status(200).json({
+//       success: true,
+//       post
+//     })
+//   } catch (error) {
+//     res.status(400).json({
+//       success: false,
+//       error: error.message
+//     })
+//   }
+// }
 
 const deletePost = async (req, res) => {
   try {
-    const { postID } = req.body;
+    const postID = req.params.postID;
+    const post = await Post.findOne({ _id: postID });
     const deletedPost = await Post.deleteOne({ _id: postID })
     const user_posts = await UserPost.findOne({ author: req.user.profileID });
     user_posts.posts.pull(postID);
     await user_posts.save();
+    await cloudinary.uploader.destroy(post.img.cloudinary_id);
     res.status(200).json({
       success: true,
       deletedPost
     })
   } catch (error) {
+    console.log(error);
     res.status(200).json({
       success: false,
       error: error.message
