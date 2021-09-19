@@ -5,6 +5,7 @@ const { checkUser } = require('./middleware/auth.middleware.js');
 const profileRoutes = require('./routes/profile.route.js');
 const authRoutes = require('./routes/auth.route.js');
 const postRoutes = require('./routes/post.route.js');
+const replyRoutes = require('./routes/reply.route.js');
 const feedRoutes = require('./routes/feed.route.js');
 const notificationRoutes = require('./routes/notification.route.js');
 
@@ -24,6 +25,8 @@ app.get('/', (req, res) => {
 app.use('/user', authRoutes);
 
 app.use('/post', postRoutes);
+
+app.use('/reply', replyRoutes);
 
 app.use('/profile', profileRoutes);
 

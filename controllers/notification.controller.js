@@ -25,9 +25,9 @@ const createNotification = async ({postID, profileID, replyID, senderID ,recieve
       notification = new Notification({
         reciever: recieverID,
         sender: senderID,
-        type: 'LIKED',
+        type: 'REPLY',
         onItem: replyID,
-        onModel: 'reply'
+        onModel: 'post'
       });
     }
     await notification.save();
@@ -45,6 +45,7 @@ const createNotification = async ({postID, profileID, replyID, senderID ,recieve
       await recieverNotifications.save();
     }
   } catch (error) {
+    console.log(error);
   }
 }
 
@@ -82,7 +83,7 @@ const readNotification = async (req, res) => {
     const { notificationID } = req.body;
     const filter = { _id: notificationID };
     const update = { isRead: true };
-    const notification = Notification.findOneAndUpdate(filter, update, {
+    const notification = await Notification.findOneAndUpdate(filter, update, {
       new: true
     });
     res.status(200).json({
@@ -90,6 +91,7 @@ const readNotification = async (req, res) => {
       notification
     })
   } catch (error) {
+    console.log(error);
     res.status(400).json({
       success: false,
       error: error.message

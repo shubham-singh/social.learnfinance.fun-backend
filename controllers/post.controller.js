@@ -38,12 +38,13 @@ const getPost = async (req, res) => {
     const post = await Post.findOne({ _id: postID })
     .populate({ path: 'author', select: 'username name img.profile' })
     .populate({ path: 'likes', select: '_id username name img.profile' })
-    // .populate({ 
-    //   path: 'replies', 
-    //   populate: {
-    //     path: 'author likes'
-    //   }
-    // });
+    .populate({ 
+      path: 'replies', 
+      populate: {
+        path: 'author',
+        select: 'username name img.profile'
+      }
+    });
     if (post === null) {
       throw new Error('post deleted')
     }
@@ -88,7 +89,7 @@ const post = async (req, res) => {
       });
       await newUserPost.save();
     } else {
-      user_posts.posts.unshift(post._id);
+      user_posts.posts.push(post._id);
       await user_posts.save();
     }
     res.status(200).json({
@@ -102,39 +103,6 @@ const post = async (req, res) => {
     })
   }
 }
-// const post = async (req, res) => {
-//   try {
-//     const { body } = req.body;
-//     const user_posts = await UserPost.findOne({ author: req.user.profileID });
-//     const newPost = new Post({
-//       author: req.user.profileID,
-//       body: body,
-//       likes: [],
-//       replies: []
-//     });
-//     const post = await newPost.save();
-//     await post.populate({ path: 'author', select: 'username name img.profile' })
-//     if (user_posts === null) {
-//       const newUserPost = new UserPost({
-//         author: req.user.profileID,
-//         posts: [post._id]
-//       });
-//       await newUserPost.save();
-//     } else {
-//       user_posts.posts.unshift(post._id);
-//       await user_posts.save();
-//     }
-//     res.status(200).json({
-//       success: true,
-//       post
-//     })
-//   } catch (error) {
-//     res.status(400).json({
-//       success: false,
-//       error: error.message
-//     })
-//   }
-// }
 
 const deletePost = async (req, res) => {
   try {
