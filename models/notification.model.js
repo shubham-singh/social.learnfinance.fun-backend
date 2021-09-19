@@ -12,7 +12,7 @@ const notificationSchema = new Schema({
   },
   type: {
     type: String,
-    enum: ['LIKED', 'FOLLOWED'],
+    enum: ['LIKED', 'FOLLOWED', 'REPLY'],
     required: [true, 'notification is of type empty']
   },
   onItem: {
