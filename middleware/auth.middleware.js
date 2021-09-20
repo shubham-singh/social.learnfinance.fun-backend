@@ -5,7 +5,7 @@ const secret = process.env['secret'];
 
 const checkUser = async (req, res, next) => {
   const token = req.headers.authorization;
-
+  
   try {
     if(token) {
       const decoded = jwt.verify(token, secret);
