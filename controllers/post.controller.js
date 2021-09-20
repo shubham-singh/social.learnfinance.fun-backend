@@ -97,6 +97,7 @@ const post = async (req, res) => {
       post
     })
   } catch (error) {
+    await cloudinary.uploader.destroy(imageID);
     res.status(400).json({
       success: false,
       error: error.message
