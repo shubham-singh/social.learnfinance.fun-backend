@@ -97,6 +97,7 @@ const post = async (req, res) => {
       post
     })
   } catch (error) {
+    await cloudinary.uploader.destroy(imageID);
     res.status(400).json({
       success: false,
       error: error.message
@@ -112,13 +113,14 @@ const deletePost = async (req, res) => {
     const user_posts = await UserPost.findOne({ author: req.user.profileID });
     user_posts.posts.pull(postID);
     await user_posts.save();
-    await cloudinary.uploader.destroy(post.img.cloudinary_id);
+    if (post.img.cloudinary_id !== "") {
+      await cloudinary.uploader.destroy(post.img.cloudinary_id);
+    }
     res.status(200).json({
       success: true,
       deletedPost
     })
   } catch (error) {
-    console.log(error);
     res.status(200).json({
       success: false,
       error: error.message

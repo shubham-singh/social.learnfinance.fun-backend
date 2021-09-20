@@ -38,6 +38,7 @@ const reply = async (req, res) => {
     }
 
   } catch (error) {
+    await cloudinary.uploader.destroy(imageID);
     res.status(400).json({
       success: false,
       error: error.message
