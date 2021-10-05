@@ -46,7 +46,10 @@ const getPost = async (req, res) => {
       }
     });
     if (post === null) {
-      throw new Error('post deleted')
+      return res.status(200).json({
+        success: false,
+        error: 'post deleted'
+      })
     }
     res.status(200).json({
       success: true,
