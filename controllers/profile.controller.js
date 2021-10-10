@@ -116,7 +116,7 @@ const changeUsername = async (req, res) => {
     const { username } = req.body;
     const filter = { user_id: userID }
     const update = { username: username }
-    const profile = await Profile.findOne(filter, update, { new: true })
+    const profile = await Profile.findOneAndUpdate(filter, update, { new: true })
     res.status(200).json({
       success: true,
       profile
@@ -132,18 +132,25 @@ const changeUsername = async (req, res) => {
 const changeProfile = async (req, res) => {
   try {
     const { name, bio } = req.body;
-    var imgProfile = "", imgCover = "", imgProfileID = "", imgCoverID = "";
+    var { img } = await Profile.findOne({user_id: req.user.userID})
+    var imgProfile = img.profile.src, 
+        imgCover = img.cover.src, 
+        imgProfileID = img.profile.cloudinary_id, 
+        imgCoverID = img.cover.cloudinary_id;
     if (req.files["imgProfile"] !== undefined) {
       const result = await cloudinary.uploader.upload(req.files["imgProfile"][0].path);
+      img.profile.cloudinary_id ? await cloudinary.uploader.destroy(imgProfileID) : null;
       imgProfile = result.secure_url;
       imgProfileID = result.public_id;
     }
     if (req.files["imgCover"] !== undefined) {
       const result = await cloudinary.uploader.upload(req.files["imgCover"][0].path);
+      console.log(result);
+      img.cover.cloudinary_id ? await cloudinary.uploader.destroy(imgCoverID) : null;
       imgCover = result.secure_url;
       imgCoverID = result.public_id;
     }
-    const filter = { user_id: userID }
+    const filter = { user_id: req.user.userID }
     const update = {
       name,
       bio,
@@ -158,14 +165,18 @@ const changeProfile = async (req, res) => {
         }
       }
     }
-    const profile = await Profile.findOne(filter, update, { new: true })
+    const profile = await Profile.findOneAndUpdate(filter, update, { new: true });
     res.status(200).json({
       success: true,
       profile
     })
   } catch (error) {
-    await cloudinary.uploader.destroy(imgProfileID);
-    await cloudinary.uploader.destroy(imgCoverID);
+    if (!img.profile.cloudinary_id === imgProfileID) {
+      await cloudinary.uploader.destroy(imgProfileID);
+    }
+    if (!img.cover.cloudinart_id === imgCoverID) {
+      await cloudinary.uploader.destroy(imgCoverID);
+    }
     res.status(400).json({
       success: false,
       error: error.message

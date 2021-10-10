@@ -13,6 +13,7 @@ router
 .use(checkUser)
 .get('/', getProfile)
 .post('/', imgUpload, createProfile)
+.post('/edit', imgUpload, changeProfile)
 .post('/username/check', checkUsername)
 .post('/username/change', changeUsername)
 .post('/follow', follow)
